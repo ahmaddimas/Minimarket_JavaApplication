@@ -52,7 +52,7 @@ public class login extends javax.swing.JFrame {
 
         jLabel1.setText("Username");
         jPanel2.add(jLabel1);
-        jLabel1.setBounds(80, 60, 48, 14);
+        jLabel1.setBounds(50, 50, 80, 20);
         jPanel2.add(username);
         username.setBounds(160, 50, 179, 30);
         jPanel2.add(password);
@@ -60,7 +60,7 @@ public class login extends javax.swing.JFrame {
 
         jLabel2.setText("Password");
         jPanel2.add(jLabel2);
-        jLabel2.setBounds(80, 100, 46, 14);
+        jLabel2.setBounds(50, 100, 90, 20);
 
         login.setBackground(new java.awt.Color(255, 255, 255));
         login.setText("Login");
