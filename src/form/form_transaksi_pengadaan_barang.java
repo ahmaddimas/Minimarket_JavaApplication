@@ -1,0 +1,392 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package form;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import src.koneksi;
+
+
+
+public class form_transaksi_pengadaan_barang extends javax.swing.JFrame {
+
+    private Statement statement;
+    private ResultSet resultset;
+    private koneksi konek;
+    private ResultSet resultSet;
+    int count;
+    String Id_pengadaan ="";
+    String id_hapus;
+
+    Object header[] = {"ID PENGADAAN", "USERNAME", "ID_BARANG", "TANGGAL", "SUPPLIER", "JUMLAH"};
+    DefaultTableModel defaultTable = new DefaultTableModel(null, header);
+    /**
+     * Creates new form form_transaksi_pengadaan_barang
+     */
+
+
+    
+    public form_transaksi_pengadaan_barang() {
+        initComponents();
+        konek = new koneksi();
+        select();
+        PanggilBarangToComboBox();
+    }
+    
+   
+    
+    private void PanggilBarangToComboBox() {
+        barang.removeAllItems();
+        String sql = "select nama_barang from barang";
+        try {
+            resultset = statement.executeQuery(sql);
+            while (resultset.next()) {
+                barang.addItem(resultset.getString(1));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "error : " + e.getMessage());
+        }
+    }
+    
+    private void select() {
+        Tabel_pengadaan.setModel(defaultTable);
+        /* Tabel_pengadaan.getColumnModel().getColumn(4).setCellRenderer(new ButtonDetail());*/
+
+        int baris = Tabel_pengadaan.getRowCount();
+        for (int i = 0; i < baris; i++) {
+            defaultTable.removeRow(i);
+        }
+
+        String sql_select = "select * from pengadaan";
+        try {
+            statement = konek.connection.createStatement();
+            resultset = statement.executeQuery(sql_select);
+
+            while (resultset.next()) {
+                String id_Pengadaan = resultset.getString("id_pengadaan");
+                String username = resultset.getString(2);
+                String id_barang = resultset.getString(3);
+                String tanggal = resultset.getString(4);
+                String supplier = resultset.getString(5);
+                double total = resultset.getDouble(6);
+
+                Object kolom[] = {id_Pengadaan,username,id_barang, tanggal, supplier, total};
+                defaultTable.addRow(kolom);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "ERROR : " + e.getMessage());
+        }
+    }
+
+    private void insertData() {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String tanggal = dateFormat.format(Tanggal.getDate());
+
+            SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd.MM.yyyy");
+            String tanggal2 = dateFormat2.format(Tanggal.getDate());
+
+            count = 100;
+            String sqltanggal = "select TANGGAL, ID_PENGADAAN from pengadaan";
+            resultSet = statement.executeQuery(sqltanggal);
+
+            while (resultSet.next()) {
+                String data1 = resultSet.getString(1);
+                String data2 = resultSet.getString(2);
+                if (data1.equals(tanggal)) {
+                    if (count == Integer.valueOf(data2.substring(14, 17))) {
+                        count++;
+                    }
+                }
+            }
+            String sql = "select id_barang from barang where nama_barang='" + barang.getSelectedItem() + "'";
+            resultSet = statement.executeQuery(sql);
+            String idbar = "";
+            while (resultSet.next()) {
+                idbar = resultSet.getString(1);
+            }
+            String id_pengadaan = "TB." + tanggal2 + "." + count;
+            sql = "insert into pengadaan "
+                    + "values('" + id_pengadaan + "','Admin','" + idbar + "', '" + tanggal + "','" + Supplier.getText() + "',' " + Integer.parseInt(jumlah.getText()) + "')";
+            statement.executeUpdate(sql);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+
+    private void deleteData(){
+        String sql_delete = "delete from pengadaan where ID_PENGADAAN = '"+id_hapus+"'";
+        try {
+            statement.executeUpdate(sql_delete);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,"Data masih digunakan!!");
+        }
+    }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        Supplier = new javax.swing.JTextField();
+        Tanggal = new com.toedter.calendar.JDateChooser();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Tabel_pengadaan = new javax.swing.JTable();
+        jLabel5 = new javax.swing.JLabel();
+        barang = new javax.swing.JComboBox();
+        jumlah = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        jLabel1.setText("TRANSAKSI PENGADAAN BARANG");
+
+        jLabel2.setText("Tanggal");
+
+        jLabel3.setText("Suplier");
+
+        jButton1.setText("Cancel");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Insert");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        Tabel_pengadaan.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        Tabel_pengadaan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Tabel_pengadaanMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(Tabel_pengadaan);
+
+        jLabel5.setText("Barang");
+
+        barang.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        barang.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                barangMouseClicked(evt);
+            }
+        });
+        barang.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                barangActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Jumlah");
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3)
+                        .addGap(54, 54, 54)
+                        .addComponent(Supplier, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(69, 69, 69)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel5))
+                        .addGap(45, 45, 45)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(barang, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Tanggal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel6)
+                        .addGap(54, 54, 54)
+                        .addComponent(jumlah, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(95, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(97, 97, 97)
+                        .addComponent(jScrollPane1))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2)
+                        .addGap(42, 42, 42)
+                        .addComponent(jButton3)))
+                .addGap(54, 54, 54))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(25, 25, 25)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(Tanggal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(barang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(Supplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
+                .addGap(20, 20, 20))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+         if ( Supplier.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "Silahkan Lengkapi Inputan Anda");
+        } else {
+        insertData();
+        select();
+    }      
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+         if (Supplier.getText().equals("")) {
+          JOptionPane.showMessageDialog(null, "Silahkan pilih data yang akan di Hapus");
+        } else {
+        deleteData();
+        select();
+       
+    }        
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void Tabel_pengadaanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabel_pengadaanMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Tabel_pengadaanMouseClicked
+
+    private void barangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_barangMouseClicked
+        // TODO add your handling code here:
+        PanggilBarangToComboBox();
+    }//GEN-LAST:event_barangMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void barangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_barangActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_barangActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(form_transaksi_pengadaan_barang.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(form_transaksi_pengadaan_barang.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(form_transaksi_pengadaan_barang.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(form_transaksi_pengadaan_barang.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new form_transaksi_pengadaan_barang().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField Supplier;
+    private javax.swing.JTable Tabel_pengadaan;
+    private com.toedter.calendar.JDateChooser Tanggal;
+    private javax.swing.JComboBox barang;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jumlah;
+    // End of variables declaration//GEN-END:variables
+}
